@@ -1,16 +1,32 @@
 "use strict";
 
-import axios from "axios";
-import createHmac from "create-hmac";
-import OAuth from "oauth-1.0a";
-import Url from "url-parse";
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = exports.OptionsException = void 0;
+
+var _axios = _interopRequireDefault(require("axios"));
+
+var _createHmac = _interopRequireDefault(require("create-hmac"));
+
+var _oauth = _interopRequireDefault(require("oauth-1.0a"));
+
+var _urlParse = _interopRequireDefault(require("url-parse"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 /**
  * WooCommerce REST API wrapper
  *
  * @param {Object} opt
  */
-export default class WooCommerceRestApi {
+class WooCommerceRestApi {
   /**
    * Class constructor.
    *
@@ -36,14 +52,16 @@ export default class WooCommerceRestApi {
     }
 
     this.classVersion = "1.0.1";
+
     this._setDefaultsOptions(opt);
   }
-
   /**
    * Set default options
    *
    * @param {Object} opt
    */
+
+
   _setDefaultsOptions(opt) {
     this.url = opt.url;
     this.wpAPIPrefix = opt.wpAPIPrefix || "wp-json";
@@ -57,13 +75,14 @@ export default class WooCommerceRestApi {
     this.timeout = opt.timeout;
     this.axiosConfig = opt.axiosConfig || {};
   }
-
   /**
    * Parse params object.
    *
    * @param {Object} params
    * @param {Object} query
    */
+
+
   _parseParamsObject(params, query) {
     for (const key in params) {
       const value = params[key];
@@ -80,7 +99,6 @@ export default class WooCommerceRestApi {
 
     return query;
   }
-
   /**
    * Normalize query string for oAuth
    *
@@ -89,23 +107,24 @@ export default class WooCommerceRestApi {
    *
    * @return {String}
    */
+
+
   _normalizeQueryString(url, params) {
     // Exit if don't find query string.
     if (url.indexOf("?") === -1 && Object.keys(params).length === 0) {
       return url;
     }
 
-    const query = new Url(url, null, true).query;
+    const query = new _urlParse.default(url, null, true).query;
     const values = [];
+    let queryString = ""; // Include params object into URL.searchParams.
 
-    let queryString = "";
-
-    // Include params object into URL.searchParams.
     this._parseParamsObject(params, query);
 
     for (const key in query) {
       values.push(key);
     }
+
     values.sort();
 
     for (const i in values) {
@@ -113,16 +132,13 @@ export default class WooCommerceRestApi {
         queryString += "&";
       }
 
-      queryString += encodeURIComponent(values[i])
-        .replace(/%5B/g, "[")
-        .replace(/%5D/g, "]");
+      queryString += encodeURIComponent(values[i]).replace(/%5B/g, "[").replace(/%5D/g, "]");
       queryString += "=";
       queryString += encodeURIComponent(query[values[i]]);
     }
 
     return url.split("?")[0] + "?" + queryString;
   }
-
   /**
    * Get URL
    *
@@ -131,17 +147,15 @@ export default class WooCommerceRestApi {
    *
    * @return {String}
    */
+
+
   _getUrl(endpoint, params) {
     const api = this.wpAPIPrefix + "/";
-
     let url = this.url.slice(-1) === "/" ? this.url : this.url + "/";
+    url = url + api + this.version + "/" + endpoint; // Include port.
 
-    url = url + api + this.version + "/" + endpoint;
-
-    // Include port.
     if (this.port !== "") {
-      const hostname = new Url(url).hostname;
-
+      const hostname = new _urlParse.default(url).hostname;
       url = url.replace(hostname, hostname + ":" + this.port);
     }
 
@@ -151,12 +165,13 @@ export default class WooCommerceRestApi {
 
     return url;
   }
-
   /**
    * Get OAuth
    *
    * @return {Object}
    */
+
+
   _getOAuth() {
     const data = {
       consumer: {
@@ -165,15 +180,11 @@ export default class WooCommerceRestApi {
       },
       signature_method: "HMAC-SHA256",
       hash_function: (base, key) => {
-        return createHmac("sha256", key)
-          .update(base)
-          .digest("base64");
+        return (0, _createHmac.default)("sha256", key).update(base).digest("base64");
       }
     };
-
-    return new OAuth(data);
+    return new _oauth.default(data);
   }
-
   /**
    * Do requests
    *
@@ -184,20 +195,18 @@ export default class WooCommerceRestApi {
    *
    * @return {Object}
    */
+
+
   _request(method, endpoint, data, params = {}) {
     const url = this._getUrl(endpoint, params);
 
     const headers = {
       Accept: "application/json"
-    };
-    // only set "User-Agent" in node environment
+    }; // only set "User-Agent" in node environment
     // the checking method is identical to upstream axios
-    if (
-      typeof process !== "undefined" &&
-      Object.prototype.toString.call(process) === "[object process]"
-    ) {
-      headers["User-Agent"] =
-        "WooCommerce REST API - JS Client/" + this.classVersion;
+
+    if (typeof process !== "undefined" && Object.prototype.toString.call(process) === "[object process]") {
+      headers["User-Agent"] = "WooCommerce REST API - JS Client/" + this.classVersion;
     }
 
     let options = {
@@ -222,7 +231,7 @@ export default class WooCommerceRestApi {
         };
       }
 
-      options.params = { ...options.params, ...params };
+      options.params = _objectSpread(_objectSpread({}, options.params), params);
     } else {
       options.params = this._getOAuth().authorize({
         url: url,
@@ -233,14 +242,12 @@ export default class WooCommerceRestApi {
     if (typeof data === 'object') {
       options.headers["Content-Type"] = "application/json;charset=utf-8";
       options.data = data;
-    }
+    } // Allow set and override Axios options.
 
-    // Allow set and override Axios options.
-    options = { ...options, ...this.axiosConfig };
 
-    return axios(options);
+    options = _objectSpread(_objectSpread({}, options), this.axiosConfig);
+    return (0, _axios.default)(options);
   }
-
   /**
    * GET requests
    *
@@ -249,10 +256,11 @@ export default class WooCommerceRestApi {
    *
    * @return {Object}
    */
+
+
   get(endpoint, params = {}) {
     return this._request("get", endpoint, null, params);
   }
-
   /**
    * POST requests
    *
@@ -262,10 +270,11 @@ export default class WooCommerceRestApi {
    *
    * @return {Object}
    */
+
+
   post(endpoint, data, params = {}) {
     return this._request("post", endpoint, data, params);
   }
-
   /**
    * PUT requests
    *
@@ -275,10 +284,11 @@ export default class WooCommerceRestApi {
    *
    * @return {Object}
    */
+
+
   put(endpoint, data, params = {}) {
     return this._request("put", endpoint, data, params);
   }
-
   /**
    * DELETE requests
    *
@@ -288,10 +298,11 @@ export default class WooCommerceRestApi {
    *
    * @return {Object}
    */
+
+
   delete(endpoint, params = {}) {
     return this._request("delete", endpoint, null, params);
   }
-
   /**
    * OPTIONS requests
    *
@@ -300,15 +311,21 @@ export default class WooCommerceRestApi {
    *
    * @return {Object}
    */
+
+
   options(endpoint, params = {}) {
     return this._request("options", endpoint, null, params);
   }
-}
 
+}
 /**
  * Options Exception.
  */
-export class OptionsException {
+
+
+exports.default = WooCommerceRestApi;
+
+class OptionsException {
   /**
    * Constructor.
    *
@@ -318,4 +335,7 @@ export class OptionsException {
     this.name = "Options Error";
     this.message = message;
   }
+
 }
+
+exports.OptionsException = OptionsException;
