@@ -230,9 +230,8 @@ export default class WooCommerceRestApi {
       });
     }
 
-    if (data) {
+    if (typeof data === 'object') {
       options.headers["Content-Type"] = "application/json;charset=utf-8";
-      options.data = JSON.stringify(data);
     }
 
     // Allow set and override Axios options.
