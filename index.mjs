@@ -230,7 +230,7 @@ export default class WooCommerceRestApi {
       });
     }
 
-    if (typeof data === 'object') {
+    if (typeof data === "object") {
       options.headers["Content-Type"] = "application/json;charset=utf-8";
       options.data = data;
     }
