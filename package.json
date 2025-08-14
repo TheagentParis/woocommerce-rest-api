@@ -70,6 +70,20 @@
       "pre-commit": "lint-staged"
     }
   },
+  "resolutions": {
+    "glob/minimatch": "9.0.5",
+    "rimraf/minimatch": "9.0.5",
+    "globby/minimatch": "9.0.5",
+    "del/minimatch": "9.0.5",
+    "del-cli/minimatch": "9.0.5",
+    "jest/minimatch": "9.0.5",
+    "babel-jest/minimatch": "9.0.5",
+    "@babel/cli/minimatch": "9.0.5",
+    "eslint/minimatch": "9.0.5",
+    "mocha/minimatch": "9.0.5",
+    "@types/minimatch": "5.1.2",
+    "@types/glob/@types/minimatch": "5.1.2"
+  },
   "lint-staged": {
     "*.{js,mjs}": [
       "eslint --fix",

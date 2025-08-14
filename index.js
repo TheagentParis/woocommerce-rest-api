@@ -4,23 +4,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = exports.OptionsException = void 0;
-
 var _axios = _interopRequireDefault(require("axios"));
-
 var _createHmac = _interopRequireDefault(require("create-hmac"));
-
 var _oauth = _interopRequireDefault(require("oauth-1.0a"));
-
 var _urlParse = _interopRequireDefault(require("url-parse"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { _defineProperty(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
+function _defineProperty(e, r, t) { return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, { value: t, enumerable: !0, configurable: !0, writable: !0 }) : e[r] = t, e; }
+function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : i + ""; }
+function _toPrimitive(t, r) { if ("object" != typeof t || !t) return t; var e = t[Symbol.toPrimitive]; if (void 0 !== e) { var i = e.call(t, r || "default"); if ("object" != typeof i) return i; throw new TypeError("@@toPrimitive must return a primitive value."); } return ("string" === r ? String : Number)(t); }
 /**
  * WooCommerce REST API wrapper
  *
@@ -36,32 +29,25 @@ class WooCommerceRestApi {
     if (!(this instanceof WooCommerceRestApi)) {
       return new WooCommerceRestApi(opt);
     }
-
     opt = opt || {};
-
     if (!opt.url) {
       throw new OptionsException("url is required");
     }
-
     if (!opt.consumerKey) {
       throw new OptionsException("consumerKey is required");
     }
-
     if (!opt.consumerSecret) {
       throw new OptionsException("consumerSecret is required");
     }
-
     this.classVersion = "1.0.1";
-
     this._setDefaultsOptions(opt);
   }
+
   /**
    * Set default options
    *
    * @param {Object} opt
    */
-
-
   _setDefaultsOptions(opt) {
     this.url = opt.url;
     this.wpAPIPrefix = opt.wpAPIPrefix || "wp-json";
@@ -75,18 +61,16 @@ class WooCommerceRestApi {
     this.timeout = opt.timeout;
     this.axiosConfig = opt.axiosConfig || {};
   }
+
   /**
    * Parse params object.
    *
    * @param {Object} params
    * @param {Object} query
    */
-
-
   _parseParamsObject(params, query) {
     for (const key in params) {
       const value = params[key];
-
       if (typeof value === "object") {
         for (const prop in value) {
           const itemKey = key.toString() + "[" + prop.toString() + "]";
@@ -96,9 +80,9 @@ class WooCommerceRestApi {
         query[key] = value;
       }
     }
-
     return query;
   }
+
   /**
    * Normalize query string for oAuth
    *
@@ -107,38 +91,32 @@ class WooCommerceRestApi {
    *
    * @return {String}
    */
-
-
   _normalizeQueryString(url, params) {
     // Exit if don't find query string.
     if (url.indexOf("?") === -1 && Object.keys(params).length === 0) {
       return url;
     }
-
     const query = new _urlParse.default(url, null, true).query;
     const values = [];
-    let queryString = ""; // Include params object into URL.searchParams.
+    let queryString = "";
 
+    // Include params object into URL.searchParams.
     this._parseParamsObject(params, query);
-
     for (const key in query) {
       values.push(key);
     }
-
     values.sort();
-
     for (const i in values) {
       if (queryString.length) {
         queryString += "&";
       }
-
       queryString += encodeURIComponent(values[i]).replace(/%5B/g, "[").replace(/%5D/g, "]");
       queryString += "=";
       queryString += encodeURIComponent(query[values[i]]);
     }
-
     return url.split("?")[0] + "?" + queryString;
   }
+
   /**
    * Get URL
    *
@@ -147,31 +125,27 @@ class WooCommerceRestApi {
    *
    * @return {String}
    */
-
-
   _getUrl(endpoint, params) {
     const api = this.wpAPIPrefix + "/";
     let url = this.url.slice(-1) === "/" ? this.url : this.url + "/";
-    url = url + api + this.version + "/" + endpoint; // Include port.
+    url = url + api + this.version + "/" + endpoint;
 
+    // Include port.
     if (this.port !== "") {
       const hostname = new _urlParse.default(url).hostname;
       url = url.replace(hostname, hostname + ":" + this.port);
     }
-
     if (!this.isHttps) {
       return this._normalizeQueryString(url, params);
     }
-
     return url;
   }
+
   /**
    * Get OAuth
    *
    * @return {Object}
    */
-
-
   _getOAuth() {
     const data = {
       consumer: {
@@ -185,6 +159,7 @@ class WooCommerceRestApi {
     };
     return new _oauth.default(data);
   }
+
   /**
    * Do requests
    *
@@ -195,20 +170,16 @@ class WooCommerceRestApi {
    *
    * @return {Object}
    */
-
-
   _request(method, endpoint, data, params = {}) {
     const url = this._getUrl(endpoint, params);
-
     const headers = {
       Accept: "application/json"
-    }; // only set "User-Agent" in node environment
+    };
+    // only set "User-Agent" in node environment
     // the checking method is identical to upstream axios
-
     if (typeof process !== "undefined" && Object.prototype.toString.call(process) === "[object process]") {
       headers["User-Agent"] = "WooCommerce REST API - JS Client/" + this.classVersion;
     }
-
     let options = {
       url: url,
       method: method,
@@ -217,7 +188,6 @@ class WooCommerceRestApi {
       responseType: "json",
       headers
     };
-
     if (this.isHttps) {
       if (this.queryStringAuth) {
         options.params = {
@@ -230,7 +200,6 @@ class WooCommerceRestApi {
           password: this.consumerSecret
         };
       }
-
       options.params = _objectSpread(_objectSpread({}, options.params), params);
     } else {
       options.params = this._getOAuth().authorize({
@@ -238,16 +207,16 @@ class WooCommerceRestApi {
         method: method
       });
     }
-
-    if (typeof data === 'object') {
+    if (typeof data === "object") {
       options.headers["Content-Type"] = "application/json;charset=utf-8";
       options.data = data;
-    } // Allow set and override Axios options.
+    }
 
-
+    // Allow set and override Axios options.
     options = _objectSpread(_objectSpread({}, options), this.axiosConfig);
     return (0, _axios.default)(options);
   }
+
   /**
    * GET requests
    *
@@ -256,11 +225,10 @@ class WooCommerceRestApi {
    *
    * @return {Object}
    */
-
-
   get(endpoint, params = {}) {
     return this._request("get", endpoint, null, params);
   }
+
   /**
    * POST requests
    *
@@ -270,11 +238,10 @@ class WooCommerceRestApi {
    *
    * @return {Object}
    */
-
-
   post(endpoint, data, params = {}) {
     return this._request("post", endpoint, data, params);
   }
+
   /**
    * PUT requests
    *
@@ -284,11 +251,10 @@ class WooCommerceRestApi {
    *
    * @return {Object}
    */
-
-
   put(endpoint, data, params = {}) {
     return this._request("put", endpoint, data, params);
   }
+
   /**
    * DELETE requests
    *
@@ -298,11 +264,10 @@ class WooCommerceRestApi {
    *
    * @return {Object}
    */
-
-
   delete(endpoint, params = {}) {
     return this._request("delete", endpoint, null, params);
   }
+
   /**
    * OPTIONS requests
    *
@@ -311,20 +276,15 @@ class WooCommerceRestApi {
    *
    * @return {Object}
    */
-
-
   options(endpoint, params = {}) {
     return this._request("options", endpoint, null, params);
   }
-
 }
+
 /**
  * Options Exception.
  */
-
-
 exports.default = WooCommerceRestApi;
-
 class OptionsException {
   /**
    * Constructor.
@@ -335,7 +295,5 @@ class OptionsException {
     this.name = "Options Error";
     this.message = message;
   }
-
 }
-
 exports.OptionsException = OptionsException;
